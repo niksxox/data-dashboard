@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Netflix Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #141414; color: white; text-align: center; }
+        .container { width: 50%; margin: auto; background: #222; padding: 20px; border-radius: 10px; }
+        button { background: #E50914; color: white; border: none; padding: 10px 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🎬 Netflix Analytics Dashboard</h1>
+    <div class="container">
+        <input type="file" id="csvFile" accept=".csv">
+        <button onclick="uploadCSV()">Upload & Process</button>
+        <canvas id="myChart" width="400" height="400"></canvas>
+    </div>
+
+    <script>
+        async function uploadCSV() {
+            let formData = new FormData();
+            formData.append("file", document.getElementById('csvFile').files[0]);
+            await fetch('/api/netflix/upload', { method: 'POST', body: formData });
+            loadCharts();
+        }
+
+        async function loadCharts() {
+            const res = await fetch('/api/netflix/stats');
+            const data = await res.json();
+            new Chart(document.getElementById('myChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Movies', 'TV Shows'],
+                    datasets: [{ data: [data.Movies, data.TVShows], backgroundColor: ['#E50914', '#ffffff'] }]
+                }
+            });
+        }
+    </script>
+</body>
+</html>
